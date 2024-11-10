@@ -94,7 +94,8 @@ const resolvers = {
           return Book.find({})
         }
         // only genre parameter
-        return Book.find({ genres: { $exists: args.genre === 'YES' } })
+        const filteredBooks = await Book.find({ genres: { $in: args.genre } })
+        return filteredBooks
       }
 
       const authorId = await Author.findOne({ name: args.author })
@@ -106,7 +107,7 @@ const resolvers = {
       }
       
       // both parameters
-      return Book.find({ author: { $exists: authorId === 'YES' }, genres: { $exists: args.genre === 'YES' }})
+      return Book.find({ author: { $in: authorId }, genres: { $in: args.genre }})
     },
     allAuthors: async () => await Author.find({}),
     me: (root, args, context) => {
