@@ -3,6 +3,7 @@ import { useMutation } from '@apollo/client'
 import { ALL_AUTHORS } from '../graphql/queries/authorQueries'
 import { CREATE_BOOK } from '../graphql/mutations/bookMutations'
 import { FIND_BOOKS } from '../graphql/queries/bookQueries'
+import { updateCache } from '../App'
 
 const CREATE_BOOK_DATA = CREATE_BOOK
 
@@ -20,7 +21,11 @@ const BookForm = ({ setError }) => {
     ],
     onError: (error) => {
       const messages = error.graphQLErrors.map(e => e.message).join('\n')
+      console.log(error)
       setError(messages)
+    },
+    update: (cache, response) => {
+      updateCache(cache, { query: FIND_BOOKS }, response.data.addBook)
     }
   })
 

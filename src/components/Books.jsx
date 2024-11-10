@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import BookList from "./BookList"
-import { FIND_BOOKS } from "../graphql/queries/bookQueries"
-import { useQuery } from "@apollo/client"
+import { BOOK_ADDED, FIND_BOOKS, ALL_BOOKS } from "../graphql/queries/bookQueries"
+import { useQuery, useSubscription } from "@apollo/client"
+import { updateCache } from "../App"
 
 const Books = ({ books }) => {
   const [filteredBooks, setfilteredBooks] = useState(books)
@@ -24,10 +25,24 @@ const Books = ({ books }) => {
   
   useEffect(() => {  
     if (result_filteredBooks.data) {  
-      setfilteredBooks(result_filteredBooks.data.allBooks)  
+      setfilteredBooks(result_filteredBooks.data.allBooks) 
     }  
   }, [result_filteredBooks.data]) 
 
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data, client }) => {
+      const addedBook = data.data.bookAdded
+      updateCache(client.cache, { query: ALL_BOOKS }, addedBook)
+      window.alert(`${addedBook.title} added`)
+      client.cache.updateQuery(
+        {query: ALL_BOOKS}, ({allBooks}) => {
+          return {
+            allBooks: allBooks.concat(addedBook)
+          }
+        }
+      )
+    }
+  })
   
 
   return (

@@ -37,7 +37,7 @@ const AuthorEdit = ({ authors, setError }) => {
           defaultValue={'a'}
         >
           {authors.map((author) =>
-            <option value={author.name}>{author.name}</option>
+            <option key={author.name} value={author.name}>{author.name}</option>
           )}
         </select>
         <div>

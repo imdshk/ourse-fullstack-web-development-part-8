@@ -1,24 +1,46 @@
-import { useQuery } from '@apollo/client'
-import Notify from './components/Notify'
-import Authors from './components/Authors'
-import Books from './components/Books'
-import BookForm from './components/BookForm'
-import { ALL_AUTHORS } from './graphql/queries/authorQueries'
-import { FIND_BOOKS } from './graphql/queries/bookQueries'
+import { 
+  useQuery, 
+  useMutation, 
+  useSubscription, 
+  useApolloClient 
+} from '@apollo/client'
 import { useState } from 'react'
-import { useApolloClient  } from '@apollo/client'
-
 import {
   BrowserRouter as Router,
   Routes, Route, Link,
   Navigate
 } from 'react-router-dom'
-import LoginForm from './components/LoginForm'
-import Recommendations from './components/Recommendations'
+
+import { ALL_AUTHORS } from './graphql/queries/authorQueries'
+import { BOOK_ADDED, ALL_BOOKS } from './graphql/queries/bookQueries'
 import { CURRENT_USER_DETAILS } from './graphql/queries/userQueries'
 
+import Notify from './components/Notify'
+import Authors from './components/Authors'
+import Books from './components/Books'
+import BookForm from './components/BookForm'
+import LoginForm from './components/LoginForm'
+import Recommendations from './components/Recommendations'
+
 const ALL_AUTHORS_DATA = ALL_AUTHORS
-const ALL_BOOKS_DATA = FIND_BOOKS
+const ALL_BOOKS_DATA = ALL_BOOKS // FIND_BOOKS
+
+// function that takes care of manipulating cacheexport 
+export const updateCache = (cache, query, addedBook) => {  
+  // helper that is used to eliminate saving same person twice  
+  const uniqByName = (a) => {    
+    let seen = new Set()    
+    return a.filter((item) => {      
+      let k = item.name      
+      return seen.has(k) ? false : seen.add(k)    
+    })  
+  }
+
+  cache.updateQuery(query, ({ allBooks }) => {    
+    return {      
+      allBooks: uniqByName(allBooks.concat(addedBook)),    
+    }  
+  })}
 
 const App = () => {
   const padding = {
@@ -34,6 +56,22 @@ const App = () => {
 
   const client = useApolloClient()
   
+  // useSubscription(BOOK_ADDED, {
+  //   onData: ({ data, client }) => {
+  //     const addedBook = data.data.bookAdded
+  //     notify(`${addedBook.title} by ${addedBook.author.name} added`)
+  //     updateCache(client.cache, { query: ALL_BOOKS_DATA }, addedBook)
+  //     window.alert(`${addedBook.title} added`)
+  //     client.cache.updateQuery(
+  //       {query: ALL_BOOKS_DATA}, ({allBooks}) => {
+  //         return {
+  //           allBooks: allBooks.concat(addedBook)
+  //         }
+  //       }
+  //     )
+  //   }
+  // })
+
   if (result_authors.loading || result_books.loading ) {
     return <div>loading...</div>
   }
@@ -70,7 +108,7 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<Authors authors={result_authors.data.allAuthors} setError={notify} />} />
-        <Route path="/books" element={<Books books={result_books.data.allBooks} /> } />
+        <Route path="/books" element={<Books books={result_books.data.allBooks} setError={notify} /> } />
         <Route path="/books/book" element={
           token ? 
           <BookForm setError={notify} /> :
