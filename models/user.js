@@ -14,12 +14,6 @@ const schema = new mongoose.Schema(
     favoriteGenre: {
       type: String
     },
-    books: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Book'
-      }
-    ],
   },
   { collection : 'users' }
 )

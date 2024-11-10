@@ -32,7 +32,6 @@ const typeDefs = `
     username: String!
     favoriteGenre: String!
     id: ID!
-    books: [Book!]!
   }
 
   type Token {
@@ -115,7 +114,8 @@ const resolvers = {
     }
   },
   Mutation: {
-    addBook: async (root, args, context) => {      
+    addBook: async (root, args) => { 
+      console.log(args)     
       let author = await Author.findOne({ name: args.author })
       if (!author) {  
         author = new Author({ name: args.author });  
@@ -144,9 +144,20 @@ const resolvers = {
 
       return book
     },  
-    editAuthor: async (root, args) => {
+    editAuthor: async (root, args, context) => {
       const author = await Author.findOne({ name: args.name })
+      const currentUser = context.currentUser
+      console.log(context)
+      if (!currentUser) {
+        throw new GraphQLError('not authenticated', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
+      }
+
       author.born = args.setBornTo
+      
       try {
         await author.save()
       } catch (error) {
@@ -236,7 +247,7 @@ startStandaloneServer(server, {
         auth.substring(7), process.env.JWT_SECRET      
       )      
       const currentUser = await User        
-        .findById(decodedToken.id).populate('books')     
+        .findById(decodedToken.id)   
       return { currentUser }    
     }  
   },
