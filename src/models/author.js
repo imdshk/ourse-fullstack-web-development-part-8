@@ -13,7 +13,13 @@ const schema = new mongoose.Schema(
     },
     bookCount: {
       type: Number
-    }
+    },
+    books: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Book'
+      }
+    ]
   },
   { collection : 'authors' }
 )
