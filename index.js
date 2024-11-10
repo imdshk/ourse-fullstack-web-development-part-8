@@ -115,7 +115,6 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args) => { 
-      console.log(args)     
       let author = await Author.findOne({ name: args.author })
       if (!author) {  
         author = new Author({ name: args.author });  
@@ -147,7 +146,7 @@ const resolvers = {
     editAuthor: async (root, args, context) => {
       const author = await Author.findOne({ name: args.name })
       const currentUser = context.currentUser
-      console.log(context)
+
       if (!currentUser) {
         throw new GraphQLError('not authenticated', {
           extensions: {
