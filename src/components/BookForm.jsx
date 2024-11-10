@@ -26,7 +26,6 @@ const BookForm = ({ setError }) => {
 
   const submit = async (event) => {
     event.preventDefault()
-
     createBook({ variables: { title, author, published: Number(published), genres} })
 
     setTitle('')
@@ -44,6 +43,7 @@ const BookForm = ({ setError }) => {
 
   return (
     <div>
+      <h2>Add Book</h2>
       <form onSubmit={submit}>
         <div>
           title <input value={title}

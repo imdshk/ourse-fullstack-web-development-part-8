@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { EDIT_AUTHOR } from '../graphql/mutations/authorMutations'
 import { ALL_AUTHORS } from '../graphql/queries/authorQueries'
 import { useMutation } from '@apollo/client'

@@ -13,7 +13,12 @@ mutation createNewBook(
     published: $published
   ) {
     title
-    author
+    author {
+      name
+      born
+      bookCount
+      id
+    }
     published
     genres
     id
